@@ -4,10 +4,12 @@
   become: true
   tasks:
 
-  - name: update repository index
+  - name: update repository index for apt
     apt:
       update_cache: yes
     when: ansible_distribution == "Ubuntu"
+#    when: ansible_distribution in ["Debian", "Ubuntu"]
+#    when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04"
 
   - name: install apache2 package
     apt:
@@ -21,3 +23,37 @@
       name: libapache2-mod-php
       state: latest
     when: ansible_distribution == "Ubuntu"
+
+
+## CentOS
+  - name: update repository index for CentOS
+    yum:
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+#    when: ansible_distribution in ["Debian", "Ubuntu"]
+#    when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04"
+
+  - name: install httpd package
+    yum:
+      name: httpd
+      state: latest
+    when: ansible_distribution == "CentOS"
+
+  - name: start systemctl / systemd httpd
+    systemd:
+      name: httpd
+      state: started
+    when: ansible_distribution == "CentOS"
+
+  - name: enabled httpd
+    systemd:
+      name: httpd
+      enabled: yes
+    when: ansible_distribution == "CentOS"
+
+
+  - name: add php support for apache
+    yum:
+      name: php
+      state: latest
+    when: ansible_distribution == "CentOS"

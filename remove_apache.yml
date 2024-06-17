@@ -21,3 +21,99 @@
       name: libapache2-mod-php
       state: absent
     when: ansible_distribution == "Ubuntu"
+
+# CentOS
+  - name: stop httpd service
+    systemd:
+      name: httpd
+      state: stopped
+    when: ansible_distribution == "CentOS"
+
+  - name: disable httpd
+    systemd:
+      name: httpd
+      enabled: no
+    when: ansible_distribution == "CentOS"
+
+  - name: remove httpd from centos
+    dnf:
+      name: httpd
+      state: absent
+    when: ansible_distribution == "CentOS"   
+
+  - name: Stop Nginx service
+      systemd:
+        name: nginx
+        state: stopped
+    when: ansible_distribution == "CentOS"
+
+  - name: Disable Nginx service
+    systemd:
+      name: nginx
+      enabled: no
+    when: ansible_distribution == "CentOS"
+
+  - name: Uninstall Nginx package
+    yum:
+      name: nginx
+      state: absent
+    when: ansible_distribution == "CentOS"
+
+  - name: Remove Nginx configuration files
+    file:
+      path: /etc/nginx
+      state: absent
+      recurse: yes
+    when: ansible_distribution == "CentOS"
+
+    - name: Remove Nginx document root
+      file:
+        path: /usr/share/nginx/html
+        state: absent
+        recurse: yes
+
+  - name: Uninstall Nginx package
+    yum:
+      name: nginx
+      state: absent
+
+  - name: Remove Nginx configuration files
+    file:
+      path: /etc/nginx
+      state: absent
+      recurse: yes
+
+  - name: Remove Nginx document root
+    file:
+      path: /usr/share/nginx/html
+      state: absent
+      recurse: yes
+
+
+
+  - name: Stop Nginx service
+    systemd:
+      name: nginx
+      state: stopped
+
+  - name: Disable Nginx service
+    systemd:
+      name: nginx
+      enabled: no
+
+  - name: Uninstall Nginx package
+    yum:
+      name: nginx
+      state: absent
+
+  - name: Remove Nginx configuration files
+    file:
+      path: /etc/nginx
+      state: absent
+      recurse: yes
+
+  - name: Remove Nginx document root
+    file:
+      path: /usr/share/nginx/html
+      state: absent
+      recurse: yes
