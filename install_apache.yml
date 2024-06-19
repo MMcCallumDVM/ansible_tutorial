@@ -4,40 +4,49 @@
   become: true
   tasks:
 
-  - name: update repository index for apt
-    apt:
-      update_cache: yes
-    when: ansible_distribution == "Ubuntu"
+#  - name: update repository index for apt   cleaned / added this to the install task
+#    apt:
+#      update_cache: yes
+#    when: ansible_distribution == "Ubuntu"
 #    when: ansible_distribution in ["Debian", "Ubuntu"]
 #    when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04"
 
-  - name: install apache2 package
-    apt:
-      name: apache2
-      state: latest
-    when: ansible_distribution == "Ubuntu"
+#  - name: install apache2 and php support package for Ubuntu shortened below
+#    apt:
+#      name:
+#         - apache2
+#         - libapache2-mod-php
+#      state: latest
+#      update_cache: yes
+#    when: ansible_distribution == "Ubuntu"
 
-
-  - name: add php support for apache
-    apt:
-      name: libapache2-mod-php
+  - name: install apache2 and php support package for Ubuntu
+    package:
+      name: 
+         - "{{ apache_package }}"
+         - "{{ php_package }}"
       state: latest
-    when: ansible_distribution == "Ubuntu"
+      update_cache: yes
+#    when: ansible_distribution == "Ubuntu"
 
 
 ## CentOS
-  - name: update repository index for CentOS
-    yum:
-      update_cache: yes
-    when: ansible_distribution == "CentOS"
+
+#  - name: update repository index for CentOS  added this to the install task below
+#    yum:
+#      update_cache: yes
+#    when: ansible_distribution == "CentOS"
 #    when: ansible_distribution in ["Debian", "Ubuntu"]
 #    when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04"
 
-  - name: install httpd package
-    yum:
-      name: httpd
-      state: latest
-    when: ansible_distribution == "CentOS"
+#  - name: install httpd and php package for CentOS
+#    yum:
+#      name: 
+#        - httpd
+#        - php
+#      state: latest
+#      update_cache: yes
+#    when: ansible_distribution == "CentOS"
 
   - name: start systemctl / systemd httpd
     systemd:
@@ -49,11 +58,4 @@
     systemd:
       name: httpd
       enabled: yes
-    when: ansible_distribution == "CentOS"
-
-
-  - name: add php support for apache
-    yum:
-      name: php
-      state: latest
     when: ansible_distribution == "CentOS"
