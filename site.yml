@@ -18,6 +18,24 @@
       update_cache: yes
     when: ansible_distribution == "Ubuntu"
 
+- hosts: workstations
+  become: true
+  tasks:
+
+  - name: install unzip
+    package:
+      name:  unzip
+
+  - name: install terraform
+    unarchive:
+      src: https://releases.hashicorp.com/terraform/1.8.5/terraform_1.8.5_darwin_amd64.zip
+      dest: /usr/local/bin
+      remote_src: yes
+      mode: 0755
+      owner: root
+      group: root
+
+
 - hosts: web_servers
   become: true
   tasks:
@@ -53,17 +71,25 @@
       update_cache: yes
     when: ansible_distribution == "CentOS"
 
-  - name: start systemctl / systemd httpd
-    systemd:
+#  - name: start httpd (CentOS) using systemd
+#    systemd:
+#      name: httpd
+#      state: started
+#    when: ansible_distribution == "CentOS"
+
+#  - name: enabled httpd
+#    systemd:
+#      name: httpd
+#      enabled: yes
+#    when: ansible_distribution == "CentOS"
+  - name: start httpd (CentOS) using service
+    tags: apache,httpd,centos
+    service:
       name: httpd
       state: started
-    when: ansible_distribution == "CentOS"
-
-  - name: enabled httpd
-    systemd:
-      name: httpd
       enabled: yes
     when: ansible_distribution == "CentOS"
+
 
 - hosts: db_servers
   become: true

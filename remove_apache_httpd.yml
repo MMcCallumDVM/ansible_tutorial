@@ -4,38 +4,63 @@
   become: true
   tasks:
 
-  - name: update repository index
+  - name: update repository index (Ubuntu)
     apt:
       update_cache: yes
     when: ansible_distribution == "Ubuntu"
 
-  - name: remove apache2 package
+  - name: remove apache2 package (Ubuntu)
     apt:
       name: apache2
       state: absent
     when: ansible_distribution == "Ubuntu"
 
 
-  - name: remove php support for apache
+  - name: remove php support for apache (Ubuntu)
     apt:
       name: libapache2-mod-php
       state: absent
     when: ansible_distribution == "Ubuntu"
 
 
-  - name: Stop MariaDB service
+  - name: Stop and Disabled MariaDB service (ubuntu)
     service:
       name: mariadb
       state: stopped
-    when: ansible_distribution == "Ubuntu"
-
-  - name: Disable MariaDB service
-    service:
-      name: mariadb
       enabled: no
     when: ansible_distribution == "Ubuntu"
 
-  - name: Remove MariaDB packages
+#  - name: Disable MariaDB service (Ubuntu)
+#    service:
+#      name: mariadb
+#      enabled: no
+#    when: ansible_distribution == "Ubuntu"
+
+#  - name: Remove MariaDB packages (Ubuntu)
+#    apt:
+#      name: "{{ item }}"
+#      state: absent
+#    loop:
+#      - mariadb-server
+#      - mariadb-client
+#      - mariadb-common
+#    when: ansible_distribution == "Ubuntu"
+
+  - name: Remove MariaDB configuration directory (Ubuntu)
+    file:
+      path: /etc/mysql
+      state: absent
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Remove MariaDB data directory (Ubuntu)
+    file:
+      path: /var/lib/mysql
+      state: absent
+      recurse: yes
+    when: ansible_distribution == "Ubuntu"
+
+
+  - name: Remove MariaDB packages (Ubuntu)
     apt:
       name: "{{ item }}"
       state: absent
@@ -45,35 +70,31 @@
       - mariadb-common
     when: ansible_distribution == "Ubuntu"
 
-  - name: Remove MariaDB configuration directory
-    file:
-      path: /etc/mysql
-      state: absent
-    when: ansible_distribution == "Ubuntu"
-
-  - name: Remove MariaDB data directory
-    file:
-      path: /var/lib/mysql
-      state: absent
-#      recurse: yes
-    when: ansible_distribution == "Ubuntu"
-
-
-
+#  - name: Remove MariaDB configuration directory (Ubuntu)
+#    file:
+#      path: /etc/mysql
+#      state: absent
+#    when: ansible_distribution == "Ubuntu"
 
 # CentOS
-
-  - name: Stop httpd service
-    systemd:
+  - name: Stop and Disable httpd with service (CentOS)
+    service:
       name: httpd
       state: stopped
-    when: ansible_distribution == "CentOS"
-
-  - name: Disable httpd service
-    systemd:
-      name: httpd
       enabled: no
     when: ansible_distribution == "CentOS"
+
+#  - name: Stop httpd service (CentOS)
+#    systemd:
+#      name: httpd
+#      state: stopped
+#    when: ansible_distribution == "CentOS"
+
+#  - name: Disable httpd service
+#    systemd:
+#      name: httpd
+#      enabled: no
+#    when: ansible_distribution == "CentOS"
 
   - name: remove httpd package
     yum:
