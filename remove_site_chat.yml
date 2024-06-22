@@ -1,0 +1,106 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Remove MariaDB and related packages (Ubuntu)
+      apt:
+        name:
+          - mariadb-server
+          - mariadb-client
+          - mariadb-common
+        state: absent
+        purge: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Remove MariaDB and related packages (CentOS)
+      yum:
+        name:
+          - mariadb
+          - mariadb-server
+          - mariadb-client
+        state: absent
+      when: ansible_distribution == "CentOS"
+
+    - name: Remove Apache and PHP packages (Ubuntu)
+      apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+        state: absent
+        purge: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Remove Apache and PHP packages (CentOS)
+      yum:
+        name:
+          - httpd
+          - php
+        state: absent
+      when: ansible_distribution == "CentOS"
+
+    - name: Remove Terraform binary
+      file:
+        path: /usr/local/bin/terraform
+        state: absent
+
+    - name: Remove Samba package (Ubuntu)
+      apt:
+        name: samba
+        state: absent
+        purge: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Remove Samba package (CentOS)
+      yum:
+        name: samba
+        state: absent
+      when: ansible_distribution == "CentOS"
+
+    - name: Autoremove unnecessary packages (Ubuntu)
+      apt:
+        autoremove: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Clean package cache (Ubuntu)
+      apt:
+        autoclean: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Clean package cache (CentOS)
+      yum:
+        name: '*'
+        state: latest
+        enablerepo: '*'
+        disable_gpg_check: yes
+        update_cache: yes
+        autoremove: yes
+      when: ansible_distribution == "CentOS"
+
+    - name: Remove MariaDB data directory (Ubuntu)
+      file:
+        path: /var/lib/mysql
+        state: absent
+        recurse: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Remove MariaDB data directory (CentOS)
+      file:
+        path: /var/lib/mysql
+        state: absent
+        recurse: yes
+      when: ansible_distribution == "CentOS"
+
+    - name: Remove MariaDB configuration directory (Ubuntu)
+      file:
+        path: /etc/mysql
+        state: absent
+        recurse: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Remove MariaDB configuration directory (CentOS)
+      file:
+        path: /etc/my.cnf.d
+        state: absent
+        recurse: yes
+      when: ansible_distribution == "CentOS"
+

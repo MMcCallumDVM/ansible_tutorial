@@ -4,19 +4,32 @@
   become: true
   pre_tasks:
 
-  - name: install updates (CentOS)
+  - name: update repo cache (CentOS)
     tags: always
     yum:
-      update_only: yes
       update_cache: yes
+    changed_when:  false
     when: ansible_distribution == "CentOS"
 
-  - name: install upadtes (Ubuntu)
+  - name: update repo cache (Ubuntu)
     tags: always
     apt:
-      upgrade: dist
       update_cache: yes
+    changed_when: false
     when: ansible_distribution == "Ubuntu"
+
+- hosts: all
+  become: true
+  tasks:
+
+
+  - name: add ssh key for simone
+    tags: always
+    authorized_key:
+      user: simone
+      key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvuhwlOUgwDh+NsPg7fw+gcZq0emk9H7ECnXjChj267 ansible"
+
+
 
 - hosts: workstations
   become: true
@@ -25,6 +38,7 @@
   - name: install unzip
     package:
       name:  unzip
+      state: latest
 
   - name: install terraform
     unarchive:
@@ -49,6 +63,22 @@
       state: latest
       update_cache: yes
     when: ansible_distribution == "Ubuntu"
+
+  - name: change email address for admin (CentOS)
+    tags: apache, apache2, httpd
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      regexp: '^ServerAdmin'
+      line: ServerAdmin somebody@nowhere.net
+    when: ansible_distribution == "CentOS"
+    register: httpd_var
+
+  - name: restart httpd (CentOS)
+    tags: apachhe, apache2, httpd, centos
+    service:
+      name: httpd
+      state: restarted
+    when: httpd_var.changed
 
   - name: copy default html file for site
     tags: apache,centos,httpd
