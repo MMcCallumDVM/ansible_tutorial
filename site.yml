@@ -20,132 +20,25 @@
 
 - hosts: all
   become: true
-  tasks:
-
-
-  - name: add ssh key for simone
-    tags: always
-    authorized_key:
-      user: simone
-      key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJvuhwlOUgwDh+NsPg7fw+gcZq0emk9H7ECnXjChj267 ansible"
-
-
+  roles:
+    - base
 
 - hosts: workstations
   become: true
-  tasks:
-
-  - name: install unzip
-    package:
-      name:  unzip
-      state: latest
-
-  - name: install terraform
-    unarchive:
-      src: https://releases.hashicorp.com/terraform/1.8.5/terraform_1.8.5_darwin_amd64.zip
-      dest: /usr/local/bin
-      remote_src: yes
-      mode: 0755
-      owner: root
-      group: root
-
+  roles:
+    - workstations
 
 - hosts: web_servers
   become: true
-  tasks:
-
-  - name: install apache2 and php support package for Ubuntu
-    tags: apache,apache2,ubuntu
-    apt:
-      name:
-         - apache2
-         - libapache2-mod-php
-      state: latest
-      update_cache: yes
-    when: ansible_distribution == "Ubuntu"
-
-  - name: change email address for admin (CentOS)
-    tags: apache, apache2, httpd
-    lineinfile:
-      path: /etc/httpd/conf/httpd.conf
-      regexp: '^ServerAdmin'
-      line: ServerAdmin somebody@nowhere.net
-    when: ansible_distribution == "CentOS"
-    register: httpd_var
-
-  - name: restart httpd (CentOS)
-    tags: apachhe, apache2, httpd, centos
-    service:
-      name: httpd
-      state: restarted
-    when: httpd_var.changed
-
-  - name: copy default html file for site
-    tags: apache,centos,httpd
-    copy:
-      src: default_site.html
-      dest: /var/www/html/index.html
-      owner: root
-      group: root
-      mode: 0644
-
-
-## CentOS
-  - name: install httpd and php for CentOS
-    tags: apache,httpd,centos
-    yum:
-      name:
-        - httpd
-        - php
-      state: latest
-      update_cache: yes
-    when: ansible_distribution == "CentOS"
-
-#  - name: start httpd (CentOS) using systemd
-#    systemd:
-#      name: httpd
-#      state: started
-#    when: ansible_distribution == "CentOS"
-
-#  - name: enabled httpd
-#    systemd:
-#      name: httpd
-#      enabled: yes
-#    when: ansible_distribution == "CentOS"
-  - name: start httpd (CentOS) using service
-    tags: apache,httpd,centos
-    service:
-      name: httpd
-      state: started
-      enabled: yes
-    when: ansible_distribution == "CentOS"
-
+  roles:
+    - web_servers
 
 - hosts: db_servers
   become: true
-  tasks:
-
-  - name: install mariadb package (CentOS)
-    tags: db,mariadb,centos
-    yum:
-      name: mariadb
-      state: latest
-    when: ansible_distribution == "CentOS"
-
-  - name: install mariadb package (Ubuntu)
-    tags: db,mariadb,ubuntu
-    apt:
-      name: mariadb-server
-      state: latest
-    when: ansible_distribution == "Ubuntu"
+  roles:
+    - db_servers
 
 - hosts: file_servers
   become: true
-  tasks:
-
-  - name: install samba package
-    tags: samba
-    package:
-      name: samba
-      state: latest
-
+  roles:
+    - file_servers
