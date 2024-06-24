@@ -1,0 +1,31 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+    - name: Remove Simone user
+      user:
+        name: simone
+        state: absent
+      tags: always
+
+   - name: Remove Simone's SSH authorized keys
+      authorized_key:
+        user: simone
+        state: absent
+      tags: always
+
+    - name: Remove Simone's .ssh directory
+      tags: user, simone, sshdir
+      file:
+        path: /home/simone/.ssh
+        state: absent
+#        recurse: yes
+      ignore_errors: yes  # Ignore errors if the .ssh directory does not exist
+
+    - name: Remove Simone's sudoers file
+      file:
+        path: /etc/sudoers.d/simone
+        state: absent
+      tags: always
+
